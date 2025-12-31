@@ -7,11 +7,13 @@ export default function Home() {
   const [role, setRole] = useState<'professor' | 'student'>('student');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [devLink, setDevLink] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    setDevLink('');
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -23,7 +25,12 @@ export default function Home() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage('✓ Magic link sent! Check your email (or console in dev mode)');
+        if (data.devLink) {
+          setMessage('✓ Magic link generated (dev mode - click below):');
+          setDevLink(data.devLink);
+        } else {
+          setMessage('✓ Magic link sent! Check your email.');
+        }
       } else {
         setMessage(`✗ ${data.error}`);
       }
@@ -102,6 +109,15 @@ export default function Home() {
             <p className={`text-sm text-center ${message.startsWith('✓') ? 'text-green-600' : 'text-red-600'}`}>
               {message}
             </p>
+          )}
+
+          {devLink && (
+            <a
+              href={devLink}
+              className="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition mt-4"
+            >
+              Click to Sign In
+            </a>
           )}
         </form>
 

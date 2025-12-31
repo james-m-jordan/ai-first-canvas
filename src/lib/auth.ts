@@ -39,16 +39,16 @@ export function verifyMagicLink(token: string): { userId: string } | null {
   return { userId: link.user_id };
 }
 
-export async function sendMagicLink(email: string, token: string) {
+export async function sendMagicLink(email: string, token: string): Promise<{ success: boolean; devLink?: string }> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
 
-  // If SMTP not configured, log the link
+  // If SMTP not configured, log and return the link for dev mode
   if (!process.env.SMTP_HOST) {
     console.log('\n🔗 Magic Link for', email);
     console.log(magicLink);
     console.log('\n');
-    return;
+    return { success: true, devLink: magicLink };
   }
 
   // Send email via SMTP
@@ -73,6 +73,7 @@ export async function sendMagicLink(email: string, token: string) {
       <p>If you didn't request this, please ignore this email.</p>
     `,
   });
+  return { success: true };
 }
 
 export function getUserById(userId: string) {

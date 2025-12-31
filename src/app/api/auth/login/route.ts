@@ -30,11 +30,12 @@ export async function POST(request: NextRequest) {
 
     // Create and send magic link
     const token = createMagicLink(user.id);
-    await sendMagicLink(email, token);
+    const result = await sendMagicLink(email, token);
 
     return NextResponse.json({
       success: true,
-      message: 'Magic link sent to your email',
+      message: result.devLink ? 'Magic link generated (dev mode)' : 'Magic link sent to your email',
+      devLink: result.devLink,
     });
   } catch (error) {
     console.error('Login error:', error);
