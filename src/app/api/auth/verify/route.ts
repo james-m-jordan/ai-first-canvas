@@ -4,15 +4,16 @@ import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
 
   if (!token) {
-    return NextResponse.redirect(new URL('/?error=invalid_token', request.url));
+    return NextResponse.redirect(new URL('/?error=invalid_token', baseUrl));
   }
 
   const result = verifyMagicLink(token);
 
   if (!result) {
-    return NextResponse.redirect(new URL('/?error=invalid_or_expired', request.url));
+    return NextResponse.redirect(new URL('/?error=invalid_or_expired', baseUrl));
   }
 
   // Set session cookie
@@ -24,5 +25,5 @@ export async function GET(request: NextRequest) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
-  return NextResponse.redirect(new URL('/dashboard', request.url));
+  return NextResponse.redirect(new URL('/dashboard', baseUrl));
 }

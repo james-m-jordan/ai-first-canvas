@@ -41,17 +41,17 @@ export function verifyMagicLink(token: string): { userId: string } | null {
 
 export async function sendMagicLink(email: string, token: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const magicLink = `${baseUrl}/auth/verify?token=${token}`;
+  const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
 
-  // In development, just log the link
-  if (process.env.NODE_ENV === 'development') {
+  // If SMTP not configured, log the link
+  if (!process.env.SMTP_HOST) {
     console.log('\n🔗 Magic Link for', email);
     console.log(magicLink);
     console.log('\n');
     return;
   }
 
-  // In production, send email (configure SMTP settings in .env)
+  // Send email via SMTP
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
